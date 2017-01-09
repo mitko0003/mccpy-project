@@ -18,13 +18,7 @@ def resample(particles, weights):
     for i in range(N):
         number = random.uniform(0.0, cumulativeProbability[N])
 
-        # To easily find the proper interval, set all smaller probabilities to 1
-        # The remaining probabilities are in increasing order as we accumulate non-negative probabilities
-        # So the end of the containing interval is now the place where the smallest element of the array is
-        tmp = np.copy(cumulativeProbability)
-        tmp[tmp < number] = 1
-        # To get the proper index of the particle, we must subtract one
-        idx = tmp.argmin() - 1
+        idx = np.searchsorted(cumulativeProbability, number) - 1
 
         newParticles[i, :] = particles[idx, :]
     return newParticles
