@@ -7,38 +7,53 @@ FPS = 15
 WINDOW_NAME = "MCCPY"
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 450
-SELECTION_RECT_SIZE = 100
 PARTICLE_RECT_SIZE = 50
 COLOR_RANGES = 8
 
 EVENT_QUIT = "quit"
 EVENT_MOUSE_POS = "mouse_pos"
-EVENT_MOUSE_CLICK = "lbd"
+EVENT_LMOUSE_DOWN = "lbd"
+EVENT_LMOUSE_UP = "lbu"
 EVENT_STARTED_TRACKING = "track"
-EVENT_INITIAL_LOCATION = "initial_loc"
+EVENT_SELECTION_RECT = "sel_rec"
+EVENT_SELECTING = "selecting"
 Events = { 
         EVENT_QUIT: False, 
-        EVENT_MOUSE_CLICK: False,
+        EVENT_LMOUSE_DOWN: False,
+        EVENT_LMOUSE_UP: False,
         EVENT_STARTED_TRACKING: False,
-        EVENT_INITIAL_LOCATION: (0, 0),
+        EVENT_SELECTING: False,
+        EVENT_SELECTION_RECT: [(0, 0), (0, 0)],
         EVENT_MOUSE_POS: (0, 0)
         }
+
+def create_rect(v1, v2):
+    print(v1, v2)
+    return [(min(v1[0], v2[0]), min(v1[1], v2[1])), (max(v1[0], v2[0]), max(v1[1], v2[1]))]
 
 def handle_input(fps):
     key = cv2.waitKey(1000//fps) & 0xFF
     if key < 0:
         return
-    if Events[EVENT_MOUSE_CLICK]:
+    if Events[EVENT_LMOUSE_DOWN]:
         if not Events[EVENT_STARTED_TRACKING]:
+            Events[EVENT_SELECTION_RECT][0] = Events[EVENT_MOUSE_POS]
+            Events[EVENT_SELECTING] = True
+        Events[EVENT_LMOUSE_DOWN] = False
+    if Events[EVENT_LMOUSE_UP]:
+        if not Events[EVENT_STARTED_TRACKING]:
+            Events[EVENT_SELECTING] = False
             Events[EVENT_STARTED_TRACKING] = True
-            Events[EVENT_INITIAL_LOCATION] = Events[EVENT_MOUSE_POS]
-        Events[EVENT_MOUSE_CLICK] = False
+            Events[EVENT_SELECTION_RECT] = create_rect(Events[EVENT_SELECTION_RECT][0], Events[EVENT_MOUSE_POS])
+        Events[EVENT_LMOUSE_UP] = False
     if key in [KEYCODE_ESC, KEYCODE_Q]: #  or cv2.getWindowProperty(WINDOW_NAME, 0) < 0
         Events[EVENT_QUIT] = True
 
 def handle_mouse(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
-        Events[EVENT_MOUSE_CLICK] = True 
+        Events[EVENT_LMOUSE_DOWN] = True 
+    if event == cv2.EVENT_LBUTTONUP:
+        Events[EVENT_LMOUSE_UP] = True 
     if event == cv2.EVENT_MOUSEMOVE:
         Events[EVENT_MOUSE_POS] = (x, y)
 
@@ -96,8 +111,13 @@ while(True):
     # Our operations on the frame come here
     # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # cv2.circle(frame, Events[EVENT_MOUSE_POS], 100, (0, 0, 255), 4, cv2.LINE_AA)
+    
+    if Events[EVENT_SELECTING]:
+        top_left, bottom_right = create_rect(Events[EVENT_SELECTION_RECT][0], Events[EVENT_MOUSE_POS])
+        cv2.rectangle(frame, top_left, bottom_right, (0, 0, 255), 4) 
     if Events[EVENT_STARTED_TRACKING]:
-        cv2.rectangle(frame, (Events[EVENT_INITIAL_LOCATION][0] - SELECTION_RECT_SIZE, Events[EVENT_INITIAL_LOCATION][1] - SELECTION_RECT_SIZE), (Events[EVENT_INITIAL_LOCATION][0] + SELECTION_RECT_SIZE, Events[EVENT_INITIAL_LOCATION][1] + SELECTION_RECT_SIZE), (0, 0, 255), 4) 
+        cv2.rectangle(frame, Events[EVENT_SELECTION_RECT][0], Events[EVENT_SELECTION_RECT][1], (0, 0, 255), 4) 
+
     # hist = cv2.calcHist([img], [0], None, [256], (0,256))
     # cv2.putText(frame, "test!",(50, 50),cv2.FONT_HERSHEY_COMPLEX_SMALL,.7,(0,0,255))
 
