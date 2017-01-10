@@ -1,10 +1,11 @@
 import numpy as np
 import math
+import random
 
 # Some global bounds
 vmax = 10
 minHeight = 5
-maxHeight = 25
+maxHeight = 200
 maxScaleChange = 0.1
 
 # variances - the variances of the noise per dimension
@@ -31,7 +32,10 @@ def propagate(particles, variances, imageSize):
         # First multiply by matrix
         # Then add random noise with expectation 0 and deviations, taken from the variance vectors
         # Here we use that (x - exp)/sqrt(deviation) ~ N(0, 1) for x ~ N(exp, deviation)
-        particles[i, :] = A.dot(np.transpose(particles[i, :])) + np.random.normal(0.0, 1.0, 7) * np.sqrt(variances)
+        
+        # particles[i, :] = A.dot(np.transpose(particles[i, :])) + np.random.normal(0.0, 1.0, 7) * np.sqrt(variances)
+
+        particles[i, :] = A.dot(particles[i, :]) + np.random.normal(0.0, 1.0, 7) * np.sqrt(variances)
 
         # Afterwards we can enforce some bounds
 
@@ -39,8 +43,8 @@ def propagate(particles, variances, imageSize):
         particles[i,0:6] = np.around(particles[i, 0:6])
 
         # First make sure particle remains in actual image
-        particles[i,0] = np.clip(particles[i, 0], 0, imageSize["width"])
-        particles[i,1] = np.clip(particles[i, 1], 0, imageSize["height"])
+        particles[i,0] = np.clip(particles[i, 0], 0, imageSize[0])
+        particles[i,1] = np.clip(particles[i, 1], 0, imageSize[1])
 
         # Then we can put bounds on velocity
         particles[i, 2:4] = np.clip(particles[i,2:4], -vmax, vmax)
