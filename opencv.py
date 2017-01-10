@@ -89,6 +89,9 @@ def histogram(image, top_left, bottom_right):
     # print(len(image), len(image[0]))
     buckets = [0] * (COLOR_RANGES ** 3)
 
+    top_left = (max(top_left[0], 0), max(top_left[1], 0))
+    bottom_right = (min(bottom_right[0], len(image) - 1), min(bottom_right[1], len(image[0] - 1)))
+
     for i in range(top_left[0], bottom_right[0]):
         for j in range(top_left[1], bottom_right[1]):
             bucket = 0
