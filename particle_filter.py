@@ -5,19 +5,22 @@ from resample import resample
 from propagate import propagate
 import numpy as np
 #number of particles
-N = 100
+N = 1000
 sigma = 0.1
 alpha = 0.1
 
 
 def get_particles_weights(particles, target):
-    particle_histograms = []
+    particle_histograms = np.zeros((len(particles), COLOR_RANGES ** 3))
     target_hist = histogram(frame, target[0], target[1])
-    for particle in particles:
-        top_left, bottom_right = particle_center_to_particle_corners(particle)
-        particle_histograms.append(histogram(frame, top_left, bottom_right))
 
-    return get_weights(target_hist, np.array(particle_histograms), sigma)
+    for i in range(len(particles)):
+        particle = particles[i, :]
+        top_left, bottom_right = particle_center_to_particle_corners(particle)
+        particle_histograms[i, :] = histogram(frame, top_left, bottom_right)
+
+
+    return get_weights(target_hist, particle_histograms, sigma)
 
 def particle_center_to_particle_corners(particle):
     top_left = int(particle[0] - particle[4] // 2), int(particle[1] - particle[5] // 2)
@@ -57,7 +60,7 @@ while target is None:
 while True:
     particles = resample(particles, weights)
 
-    particles = propagate(particles, noise, (640, 480))
+    particles = propagate(particles, noise, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
     # get frame
     ret, frame = capture.read()

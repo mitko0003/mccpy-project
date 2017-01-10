@@ -87,7 +87,7 @@ def finish_video_capture(output):
 
 def histogram(image, top_left, bottom_right):
     # print(len(image), len(image[0]))
-    buckets = [0] * (COLOR_RANGES ** 3)
+    buckets = np.zeros(COLOR_RANGES ** 3)
 
     top_left = (max(top_left[0], 0), max(top_left[1], 0))
     bottom_right = (min(bottom_right[0], len(image) - 1), min(bottom_right[1], len(image[0] - 1)))
@@ -99,7 +99,7 @@ def histogram(image, top_left, bottom_right):
                 component_range = (image[i][j][c]) // (256 // COLOR_RANGES)
                 bucket += (COLOR_RANGES ** c) * component_range
             buckets[bucket] += 1
-    return np.array(buckets) / np.sum(buckets)
+    return np.divide(buckets, np.sum(buckets))
 
 test_image = "image.jpg"
 video_filename = "output.avi"
