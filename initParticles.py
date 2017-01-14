@@ -35,7 +35,7 @@ def initParticles(upperLeft, lowerRight, N, limits):
         # Generate particle and round integer elements - number of pixels
         particle = [pos[0], pos[1], delta[0], delta[1], Hx, Hy, delta_sc]
         particle[0:6] = np.round(particle[0:6])
-        print(type(particle[0]))
+        # print(type(particle[0]))
         particles[i,:] = particle[:]
 
     return particles, weights

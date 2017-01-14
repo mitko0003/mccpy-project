@@ -2,14 +2,22 @@ import numpy as np
 import scipy.stats
 
 def bhatt_d(p, q):
-
     return np.sqrt(1 - sum(np.sqrt(p*q)))
+
+def per_color_bhatt_d(ps, qs):
+    # ps and qs contains per color histogram
+    distances = []
+    for i in range(len(ps)):
+        distances.append(sum(np.sqrt(ps[i] * qs[i])))
+    distance = (sum(distances) / len(distances))[0]
+    
+    return np.sqrt(1 - distance)
+
 
 def get_weights(target_hist, particle_set_hists, sigma=0.1):
     # default value is empirically chosen
-
     norm = scipy.stats.norm(0, sigma)
-    relative_weights = [norm.pdf(bhatt_d(target_hist, particle_hist))
+    relative_weights = [norm.pdf(per_color_bhatt_d(target_hist, particle_hist))
             for particle_hist in particle_set_hists]
     relative_weights = np.asarray(relative_weights)
     return relative_weights / sum(relative_weights)

@@ -85,6 +85,13 @@ def save_frame(output, frame):
 def finish_video_capture(output):
     output.release()
 
+def per_color_histogram(frame, top_left, bottom_right):
+    particle = frame[top_left[0]:bottom_right[0], top_left[1]:bottom_right[1]]
+    blue = cv2.calcHist([particle], [0], None, [8], [0,256])
+    green = cv2.calcHist([particle], [1], None, [8], [0,256])
+    red = cv2.calcHist([particle], [2], None, [8], [0,256])
+    return np.array([blue / sum(blue), green / sum(green), red / sum(red)])
+
 def histogram(image, top_left, bottom_right):
     # print(len(image), len(image[0]))
     buckets = np.zeros(COLOR_RANGES ** 3)
