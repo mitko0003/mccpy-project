@@ -4,7 +4,7 @@ import random
 
 # Some global bounds
 vmax = 10
-minHeight = 5
+minHeight = 50
 maxHeight = 200
 maxScaleChange = 0.1
 
@@ -32,7 +32,7 @@ def propagate(particles, variances, imageSize):
         # First multiply by matrix
         # Then add random noise with expectation 0 and deviations, taken from the variance vectors
         # Here we use that (x - exp)/sqrt(deviation) ~ N(0, 1) for x ~ N(exp, deviation)
-        
+
         # particles[i, :] = A.dot(np.transpose(particles[i, :])) + np.random.normal(0.0, 1.0, 7) * np.sqrt(variances)
 
         particles[i, :] = A.dot(particles[i, :]) + np.random.normal(0.0, 1.0, 7) * np.sqrt(variances)

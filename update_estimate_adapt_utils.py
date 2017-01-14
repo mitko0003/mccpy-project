@@ -10,7 +10,6 @@ def per_color_bhatt_d(ps, qs):
     for i in range(len(ps)):
         distances.append(sum(np.sqrt(ps[i] * qs[i])))
     distance = (sum(distances) / len(distances))[0]
-    
     return np.sqrt(1 - distance)
 
 

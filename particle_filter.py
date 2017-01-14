@@ -19,10 +19,9 @@ sigma = 0.1
 alpha = 0.1
 
 
-def get_particles_weights(frame, particles, target):
+def get_particles_weights(frame, particles, target_hist):
     particle_histograms = []
-    top_left, bottom_right = particle_center_to_particle_corners(target)
-    target_hist = per_color_histogram(frame, top_left, bottom_right)
+
     # print(target_hist)
     for i in range(len(particles)):
         particle = particles[i]
@@ -51,8 +50,10 @@ def init_target(frame):
         height = math.fabs(top_left[1] - bottom_right[1])
         target_model = [center[0], center[1], 0, 0, width, height, 0]
         particles, weights = initParticles(target[0], target[1], N, particle_delta_limits)
-        weights = get_particles_weights(frame, particles, target_model)
-        return target, target_model, weights, particles
+        top_left, bottom_right = particle_center_to_particle_corners(target_model)
+        target_hist = per_color_histogram(frame, top_left, bottom_right)
+        weights = get_particles_weights(frame, particles, target_hist)
+        return target, target_model, target_hist, weights, particles
 
 
 target = None
@@ -70,20 +71,21 @@ height = int(capture.get(4))
 
 particle_delta_limits = [200, 200, 0.1]
 noise = [50,50,10,10,50,50,0.1];
+
 if CAPTURE_FROM == WEBCAM:
     while target is None:
         ret, frame = capture.read()
         frame = cv2.flip(frame, 1)
         init_t = init_target(frame)
         if init_t is not None:
-            target, target_model, weights, particles = init_t
+            target, target_model, target_hist, weights, particles = init_t
         #TODO MAKE EVENT FOR MOUSE RELEASE INSTEAD OF THIS
 else:
     ret, frame = capture.read()
     while target is None:
         init_t = init_target(frame)
         if init_t is not None:
-            target, target_model, weights, particles = init_t
+            target, target_model, target_hist, weights, particles = init_t
 
 
 while True:
@@ -101,7 +103,7 @@ while True:
       top_left, bottom_right = particle_center_to_particle_corners(particle)
       cv2.rectangle(frame_copy, top_left, bottom_right, (0, 0, 255), 1)
 
-    weights = get_particles_weights(frame, particles, target_model)
+    weights = get_particles_weights(frame, particles, target_hist)
 
     target_estimate = estimate(weights, particles)
 
