@@ -90,7 +90,12 @@ def per_color_histogram(frame, top_left, bottom_right):
     blue = cv2.calcHist([particle], [0], None, [8], [0,256])
     green = cv2.calcHist([particle], [1], None, [8], [0,256])
     red = cv2.calcHist([particle], [2], None, [8], [0,256])
-    return np.array([blue / sum(blue), green / sum(green), red / sum(red)])
+    colors = [blue, green, red]
+    for i in range(3):
+        s = sum(colors[i])
+        if s != 0:
+            colors[i] /= s
+    return np.array(colors)
 
 def histogram(image, top_left, bottom_right):
     # print(len(image), len(image[0]))
