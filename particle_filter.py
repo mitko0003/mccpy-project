@@ -91,7 +91,7 @@ else:
 while True:
     start = time.time()
     particles = resample(particles, weights)
-    particles = propagate(particles, noise, (width, height))
+    particles = propagate(particles, noise, (width, height), Events[EVENT_RANDOM_GENERATOR])
     # get frame
     ret, frame = capture.read()
     if CAPTURE_FROM == WEBCAM:

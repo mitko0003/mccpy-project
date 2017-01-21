@@ -7,8 +7,8 @@ KEYCODE_Q = ord('q')
 
 FPS = 15
 WINDOW_NAME = "MCCPY"
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 450
+WINDOW_WIDTH = 1024
+WINDOW_HEIGHT = 768
 PARTICLE_RECT_SIZE = 50
 COLOR_RANGES = 8
 
@@ -19,6 +19,7 @@ EVENT_LMOUSE_UP = "lbu"
 EVENT_STARTED_TRACKING = "track"
 EVENT_SELECTION_RECT = "sel_rec"
 EVENT_SELECTING = "selecting"
+EVENT_RANDOM_GENERATOR = "random"
 Events = {
         EVENT_QUIT: False,
         EVENT_LMOUSE_DOWN: False,
@@ -26,7 +27,8 @@ Events = {
         EVENT_STARTED_TRACKING: False,
         EVENT_SELECTING: False,
         EVENT_SELECTION_RECT: [(0, 0), (0, 0)],
-        EVENT_MOUSE_POS: (0, 0)
+        EVENT_MOUSE_POS: (0, 0),
+        EVENT_RANDOM_GENERATOR: "numpy"
         }
 
 def create_rect(v1, v2):
@@ -64,6 +66,14 @@ def init():
     cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(WINDOW_NAME, WINDOW_WIDTH, WINDOW_HEIGHT)
     cv2.setMouseCallback(WINDOW_NAME, handle_mouse)
+    switch = """\
+            0 : numpy
+            1 : sobol
+            2 : faure
+            3 : halton
+            4 : niederreiter2 
+            """
+    cv2.createTrackbar(switch,WINDOW_NAME,0,4,trackbar_handler)
 
 def quit():
     cv2.destroyAllWindows()
@@ -74,6 +84,10 @@ def camera_resolution(capture):
 
 def read_image(filename):
     return cv2.imread(filename, 1)
+
+def trackbar_handler(value):
+    random_generators = {0: 'numpy', 1: 'sobol', 2: 'faure', 3: 'halton', 4: 'niederreiter2'}
+    Events[EVENT_RANDOM_GENERATOR] = random_generators[value]
 
 def start_video_capture(output_filename):
     fourcc = cv2.VideoWriter_fourcc(*'XVID')

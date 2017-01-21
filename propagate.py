@@ -1,6 +1,15 @@
 import numpy as np
 import math
-import random
+
+from scipy.stats import norm
+
+import quasirandom.faure as faure
+import quasirandom.sobol as sobol
+import quasirandom.halton as halton
+import quasirandom.niederreiter2 as niederreiter2
+
+sobol.seed(1);
+halton.seed(1);
 
 # Some global bounds
 vmax = 10
@@ -10,7 +19,7 @@ maxScaleChange = 0.1
 
 # variances - the variances of the noise per dimension
 # imageSize - width and height of image, should not go out of these bounds
-def propagate(particles, variances, imageSize):
+def propagate(particles, variances, imageSize, random_generator):
     N = len(particles)
 
     A = np.array([
@@ -34,8 +43,20 @@ def propagate(particles, variances, imageSize):
         # Here we use that (x - exp)/sqrt(deviation) ~ N(0, 1) for x ~ N(exp, deviation)
 
         # particles[i, :] = A.dot(np.transpose(particles[i, :])) + np.random.normal(0.0, 1.0, 7) * np.sqrt(variances)
+       
+        random_vector = None
+        if random_generator == 'sobol':
+            random_vector = np.array(list(map(norm.ppf, sobol.random(7))))
+        elif random_generator == 'faure':
+            random_vector = np.array(list(map(norm.ppf, faure.random(7))))
+        elif random_generator == 'halton':
+            random_vector = np.array(list(map(norm.ppf, halton.random(7))))
+        elif random_generator == 'niederreiter2':
+            random_vector = np.array(list(map(norm.ppf, niederreiter2.random(7))))
+        else:
+            random_vector = np.random.normal(0.0, 1.0, 7)
 
-        particles[i, :] = A.dot(particles[i, :]) + np.random.normal(0.0, 1.0, 7) * np.sqrt(variances)
+        particles[i, :] = A.dot(particles[i, :]) + random_vector * np.sqrt(variances)
 
         # Afterwards we can enforce some bounds
 
