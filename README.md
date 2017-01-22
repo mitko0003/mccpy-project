@@ -19,6 +19,16 @@ If you want to track an object from a pre-recorded video you will have to compil
 ## Possible problems
 If a problem occurs when running the particle filter with quasi-random numbers try running `setup.sh` to recompile the quasi-random number generator libraries (only works on linux).
 
+## Performance
+Performance is dependent on the video resolution, number of particles and size of particles. The video used for the benchmark had a resolution of 1280x720 pixels, 100 particles were used, with a size of approximately 40 000 pixels. The machine was running Fedora 24, and had an i7-4720HQ. In this setup around 15 frames per second could be processed. 
+
+## Use with pre-recorded video
+By default the particle filter captures video from the webcam. If you want to run it on a pre-recorded video you have to change the value of two variables:
+ ```
+ CAPTURE_FROM = VIDEO
+ VIDEO_FILE_NAME = "the_absolute_file_name_of_the_video_file"
+ ```
+
 ## How to run?
 Just run `python particle_filter.py`
 
