@@ -71,7 +71,7 @@ def init():
             1 : sobol
             2 : faure
             3 : halton
-            4 : niederreiter2 
+            4 : niederreiter2
             """
     cv2.createTrackbar(switch,WINDOW_NAME,0,4,trackbar_handler)
 

@@ -21,8 +21,6 @@ alpha = 0.1
 
 def get_particles_weights(frame, particles, target_hist):
     particle_histograms = []
-
-    # print(target_hist)
     for i in range(len(particles)):
         particle = particles[i]
         top_left, bottom_right = particle_center_to_particle_corners(particle)
@@ -64,7 +62,8 @@ if CAPTURE_FROM == WEBCAM:
 else:
     capture = cv2.VideoCapture(VIDEO_FILE_NAME)
 
-fps = capture.get(cv2.CAP_PROP_FPS)
+fps = int(capture.get(cv2.CAP_PROP_FPS))
+# print(fps)
 s_per_frame = 1 / fps
 width = int(capture.get(3))
 height = int(capture.get(4))
@@ -86,6 +85,7 @@ else:
         init_t = init_target(frame)
         if init_t is not None:
             target, target_model, target_hist, weights, particles = init_t
+            print(target_model[4] * target_model[5])
 
 
 while True:
@@ -110,8 +110,9 @@ while True:
     top_left, bottom_right = particle_center_to_particle_corners(target_estimate)
     cv2.rectangle(frame_copy, top_left, bottom_right, (0, 255, 0), 4)
 
-    handle_input(FPS)
+    handle_input(fps)
     cv2.imshow(WINDOW_NAME, frame_copy)
+
 
     end = time.time()
     time_elapsed = end - start
