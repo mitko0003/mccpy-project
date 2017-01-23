@@ -20,6 +20,7 @@ EVENT_STARTED_TRACKING = "track"
 EVENT_SELECTION_RECT = "sel_rec"
 EVENT_SELECTING = "selecting"
 EVENT_RANDOM_GENERATOR = "random"
+EVENT_SHOW_PARTICLES = "show_particles"
 Events = {
         EVENT_QUIT: False,
         EVENT_LMOUSE_DOWN: False,
@@ -28,7 +29,8 @@ Events = {
         EVENT_SELECTING: False,
         EVENT_SELECTION_RECT: [(0, 0), (0, 0)],
         EVENT_MOUSE_POS: (0, 0),
-        EVENT_RANDOM_GENERATOR: "numpy"
+        EVENT_RANDOM_GENERATOR: "numpy",
+        EVENT_SHOW_PARTICLES: False
         }
 
 def create_rect(v1, v2):
@@ -73,7 +75,14 @@ def init():
             3 : halton
             4 : niederreiter2
             """
+
     cv2.createTrackbar(switch,WINDOW_NAME,0,4,trackbar_handler)
+
+    show_particles = """
+                     0 : no particles
+                     1 : yes particles
+                     """
+    cv2.createTrackbar(show_particles, WINDOW_NAME, 0, 1, show_particles_handler)
 
 def quit():
     cv2.destroyAllWindows()
@@ -88,6 +97,10 @@ def read_image(filename):
 def trackbar_handler(value):
     random_generators = {0: 'numpy', 1: 'sobol', 2: 'faure', 3: 'halton', 4: 'niederreiter2'}
     Events[EVENT_RANDOM_GENERATOR] = random_generators[value]
+
+def show_particles_handler(value):
+    should_show = {0: False, 1: True}
+    Events[EVENT_SHOW_PARTICLES] = should_show[value]
 
 def start_video_capture(output_filename):
     fourcc = cv2.VideoWriter_fourcc(*'XVID')

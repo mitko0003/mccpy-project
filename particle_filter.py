@@ -7,12 +7,13 @@ import numpy as np
 import time
 import math
 import copy
+
 #number of particles
 WEBCAM = "webcam"
 VIDEO = "video"
 VIDEO_FILE_NAME = ""
 
-CAPTURE_FROM = WEBCAM
+CAPTURE_FROM = VIDEO
 
 N = 100
 sigma = 0.1
@@ -94,14 +95,17 @@ while True:
     particles = propagate(particles, noise, (width, height), Events[EVENT_RANDOM_GENERATOR])
     # get frame
     ret, frame = capture.read()
+    if not ret:
+        break
     if CAPTURE_FROM == WEBCAM:
         frame = cv2.flip(frame, 1)
 
     # draw all particles
     frame_copy = copy.deepcopy(frame)
-    for particle in particles:
-      top_left, bottom_right = particle_center_to_particle_corners(particle)
-      cv2.rectangle(frame_copy, top_left, bottom_right, (0, 0, 255), 1)
+    if Events[EVENT_SHOW_PARTICLES]:
+        for particle in particles:
+          top_left, bottom_right = particle_center_to_particle_corners(particle)
+          cv2.rectangle(frame_copy, top_left, bottom_right, (0, 0, 255), 1)
 
     weights = get_particles_weights(frame, particles, target_hist)
 
